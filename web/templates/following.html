@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Following - tikscrap{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div>
+        <h1 class="text-3xl font-bold text-slate-900">Following</h1>
+        <p class="text-slate-500 mt-1">Manage TikTok accounts to scrape</p>
+    </div>
+
+    <!-- Add Form -->
+    <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+        <h2 class="text-lg font-semibold text-slate-900 mb-4">Add Account</h2>
+        <form method="post" action="/following/add" class="flex gap-3">
+            <input type="text" name="username" placeholder="Enter TikTok username" 
+                class="flex-1 px-4 py-3 rounded-lg border border-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-colors outline-none">
+            <button type="submit" class="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors">
+                Add
+            </button>
+        </form>
+    </div>
+
+    <!-- Following List -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-900">Following List</h2>
+        </div>
+        {% if following %}
+        <div class="divide-y divide-slate-200">
+            {% for username in following %}
+            <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                        <span class="text-primary-600 font-semibold">{{ username[0]|upper }}</span>
+                    </div>
+                    <span class="font-medium text-slate-900">@{{ username }}</span>
+                </div>
+                <form method="post" action="/following/remove?username={{ username }}">
+                    <button type="submit" class="px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 font-medium rounded-lg transition-colors">
+                        Remove
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="px-6 py-12 text-center">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </div>
+            <p class="text-slate-500">No accounts being followed</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

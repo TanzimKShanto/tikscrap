@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Logs - tikscrap{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">Logs</h1>
+            <p class="text-slate-500 mt-1">View system logs and activity</p>
+        </div>
+        <span class="text-sm text-slate-500">Auto-refreshes every 10s</span>
+    </div>
+
+    <!-- Logs Container -->
+    <div class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+        <div class="px-4 py-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
+            <span class="text-sm font-medium text-slate-300">tikscrap.log</span>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900 text-green-300">
+                Live
+            </span>
+        </div>
+        <div id="logs" class="logs p-4 text-sm font-mono" hx-get="/logs" hx-trigger="every 10s" hx-swap="innerHTML">
+            {% for line in logs %}
+                {% if 'ERROR' in line %}
+                <div class="text-red-400">{{ line }}</div>
+                {% elif 'WARNING' in line %}
+                <div class="text-yellow-400">{{ line }}</div>
+                {% else %}
+                <div class="text-slate-300">{{ line }}</div>
+                {% endif %}
+            {% else %}
+            <div class="text-slate-500">No logs available</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
