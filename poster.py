@@ -218,7 +218,7 @@ async def main():
     post_id = post["id"]
     author = post["author"]
     title = post.get("title", "")
-    title = f"{title}\n\nCredited by @{author} - TikTok"
+    title = f"{title}\n\nPost Credit: @{author} - TikTok"
     BASE_URL = config["BASE_URL"]
     # image_urls = post.get("image_urls", [])
     image_urls = [
