@@ -192,7 +192,7 @@ def posts_page(
 
     for p in paginated_posts:
         if p.get("image_urls"):
-            p["thumbnail"] = f"{base_url}/images/{p['author']}/{p['id']}/0.jpg"
+            p["thumbnail"] = f"{base_url}/images/{p['author']}/{p['id']}/0.jpeg"
 
     return templates.TemplateResponse(
         "posts.html",
@@ -227,7 +227,7 @@ async def post_now(post_id: str, user: str = Depends(require_auth)):
     title = target.get("title", "")
     caption = f"{title}\n\nCredited by @{author} - TikTok"
     image_urls = [
-        f"{base_url}/images/{author}/{post_id}/{i}.jpg"
+        f"{base_url}/images/{author}/{post_id}/{i}.jpeg"
         for i in range(len(target.get("image_urls", [])))
     ]
 

@@ -121,7 +121,7 @@ async def fetch_user_photo_posts(
             post_dir.mkdir(parents=True, exist_ok=True)
 
             tasks = [
-                download_image(http, url, post_dir / f"{i}.jpg")
+                download_image(http, url, post_dir / f"{i}.jpeg")
                 for i, url in enumerate(image_urls)
             ]
             await asyncio.gather(*tasks)

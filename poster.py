@@ -19,7 +19,7 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-API_VERSION = "v19.0"
+API_VERSION = "v25.0"
 
 
 def load_config() -> dict:
@@ -103,12 +103,17 @@ async def upload_to_instagram(
     }
     try:
         r = await client.post(url, params=params, timeout=60)
+        log.info(f"IG item response: {r.status_code} → {r.text[:300]}...")
+
         r.raise_for_status()
         container_id = r.json().get("id")
-        log.info(f"  ↑ IG uploaded: {container_id}")
+        log.info(f" ↑ IG uploaded carousel item: {container_id}")
         return container_id
+    except httpx.HTTPStatusError as e:
+        log.error(f" ✗ IG upload failed: {e.response.status_code} - {e.response.text}")
+        return None
     except Exception as e:
-        log.error(f"  ✗ IG upload failed: {e}")
+        log.error(f" ✗ IG upload failed: {e}")
         return None
 
 
@@ -172,10 +177,11 @@ async def post_to_instagram(
         if not container_id:
             return None
         container_ids.append(container_id)
+        await asyncio.sleep(1.5)
 
     # Wait for Meta to finish processing containers before creating carousel
     log.info("  ⏳ waiting for IG containers to be ready...")
-    await asyncio.sleep(5)
+    await asyncio.sleep(8)
 
     carousel_id = await create_instagram_carousel(
         client, ig_user_id, access_token, container_ids, caption
@@ -216,7 +222,7 @@ async def main():
     BASE_URL = config["BASE_URL"]
     # image_urls = post.get("image_urls", [])
     image_urls = [
-        f"{BASE_URL}/images/{post['author']}/{post['id']}/{i}.jpg"
+        f"{BASE_URL}/images/{post['author']}/{post['id']}/{i}.jpeg"
         for i in range(len(post["image_urls"]))
     ]
 
