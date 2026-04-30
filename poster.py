@@ -94,27 +94,32 @@ async def upload_to_instagram(
     ig_user_id: str,
     access_token: str,
     image_url: str,
+    retries: int = 3,
 ) -> str | None:
-    url = f"https://graph.facebook.com/{API_VERSION}/{ig_user_id}/media"
-    params = {
-        "image_url": image_url,
-        "is_carousel_item": "true",
-        "access_token": access_token,
-    }
-    try:
-        r = await client.post(url, params=params, timeout=60)
-        log.info(f"IG item response: {r.status_code} → {r.text[:300]}...")
+    for attempt in range(retries):
+        if attempt > 0:
+            wait = attempt * 5
+            log.info(f"  ↻ IG retry {attempt}/{retries - 1}, waiting {wait}s...")
+            await asyncio.sleep(wait)
 
-        r.raise_for_status()
-        container_id = r.json().get("id")
-        log.info(f" ↑ IG uploaded carousel item: {container_id}")
-        return container_id
-    except httpx.HTTPStatusError as e:
-        log.error(f" ✗ IG upload failed: {e.response.status_code} - {e.response.text}")
-        return None
-    except Exception as e:
-        log.error(f" ✗ IG upload failed: {e}")
-        return None
+        url = f"https://graph.facebook.com/{API_VERSION}/{ig_user_id}/media"
+        params = {
+            "image_url": image_url,
+            "is_carousel_item": "true",
+            "access_token": access_token,
+        }
+        try:
+            r = await client.post(url, params=params, timeout=60)
+            if r.status_code == 200:
+                container_id = r.json().get("id")
+                log.info(f"  ↑ IG uploaded carousel item: {container_id}")
+                return container_id
+            log.warning(f"  ↻ IG attempt {attempt + 1} failed: {r.status_code}")
+        except Exception as e:
+            log.warning(f"  ↻ IG attempt {attempt + 1} exception: {e}")
+
+    log.error(f"  ✗ IG upload failed after {retries} attempts")
+    return None
 
 
 async def create_instagram_carousel(
