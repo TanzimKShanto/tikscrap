@@ -194,6 +194,9 @@ async def post_to_instagram(
     if not carousel_id:
         return None
 
+    log.info("  ⏳ waiting for carousel to be ready...")
+    await asyncio.sleep(10)  # ← add this
+
     return await publish_instagram_carousel(
         client, ig_user_id, access_token, carousel_id
     )
