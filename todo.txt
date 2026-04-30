@@ -1,0 +1,6 @@
+1. need a loader when posting stuff or fetching
+2. need to show a toast when a post successfully posted or failed
+3. need to have feature to edit the post or add photo delete photo
+4. there should be a switch to turn off or on the fetching and posting
+5. there should be a custom schedule system, and abilty to change how many post will be posted per day
+6. github workflow needed

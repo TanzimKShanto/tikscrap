@@ -44,6 +44,9 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+        /* HTMX loading states */
+        .htmx-request .btn-text { display: none; }
+        .htmx-request .btn-loader { display: inline-block !important; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
@@ -84,6 +87,57 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {% block content %}{% endblock %}
     </main>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+    <script>
+        function showToast(message, type = 'success') {
+            const colors = {
+                success: 'bg-emerald-600',
+                error: 'bg-red-600',
+                info: 'bg-primary-600'
+            };
+            const toast = document.createElement('div');
+            toast.className = `${colors[type]} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2`;
+            toast.innerHTML = `
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${type === 'success' ? 'M5 13l4 4L19 7' : 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}"/>
+                </svg>
+                <span>${message}</span>
+            `;
+            document.getElementById('toast-container').appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function handlePostSubmit(form, postId) {
+            const btn = form.querySelector('button');
+            const spinner = form.querySelector('.loading-spin');
+            const span = form.querySelector('span');
+            
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            span.textContent = 'Posting...';
+            
+            fetch(form.action, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            }).then(res => res.ok && (window.location.href = window.location.href)).then(() => {
+                showToast('Post started', 'info');
+            }).catch(() => {
+                showToast('Failed to post', 'error');
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+                span.textContent = 'Post Now';
+            });
+        }
+
+        // Check for toast params on page load
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('toast')) {
+            showToast(decodeURIComponent(params.get('toast')), params.get('toast_type') || 'success');
+        }
+    </script>
 
     <!-- Footer -->
     <footer class="border-t border-slate-200 py-6 mt-auto">

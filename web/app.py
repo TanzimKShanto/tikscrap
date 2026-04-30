@@ -423,10 +423,10 @@ def settings_save(
 @app.post("/run/fetch")
 def run_fetch(user: str = Depends(require_auth)):
     subprocess.Popen([sys.executable, str(Path(__file__).parent.parent / "main.py")])
-    return RedirectResponse("/", status_code=302)
+    return RedirectResponse("/?toast=Fetch+started", status_code=302)
 
 
 @app.post("/run/poster")
 def run_poster(user: str = Depends(require_auth)):
     subprocess.Popen([sys.executable, str(Path(__file__).parent.parent / "poster.py")])
-    return RedirectResponse("/", status_code=302)
+    return RedirectResponse("/?toast=Poster+started", status_code=302)

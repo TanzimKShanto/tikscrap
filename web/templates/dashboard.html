@@ -58,24 +58,64 @@
     <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
         <h2 class="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h2>
         <div class="flex flex-wrap gap-3">
-            <form method="post" action="/run/fetch">
+            <form method="post" action="/run/fetch" id="fetch-form" onsubmit="handleSubmit(event, this, 'Fetch started')">
                 <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow">
+                    <svg class="loading-spin w-5 h-5 animate-spin hidden" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                     </svg>
-                    Run Fetch
+                    <span>Run Fetch</span>
                 </button>
             </form>
-            <form method="post" action="/run/poster">
+            <form method="post" action="/run/poster" id="poster-form" onsubmit="handleSubmit(this, 'Poster started')">
                 <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow">
+                    <svg class="loading-spin w-5 h-5 animate-spin hidden" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 10l4-4m0 0l4 4m-4-4v12"/>
                     </svg>
-                    Run Poster
+                    <span>Run Poster</span>
                 </button>
             </form>
         </div>
     </div>
+
+<script>
+        function handleSubmit(event, form, message) {
+            event.preventDefault();
+            const btn = form.querySelector('button');
+            const spinner = form.querySelector('.loading-spin');
+            const icon = form.querySelector('svg:not(.loading-spin)');
+            const span = form.querySelector('span');
+            
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            icon.classList.add('hidden');
+            span.textContent = 'Running...';
+            
+            fetch(form.action, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            }).then(() => {
+                showToast(message, 'info');
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+                icon.classList.remove('hidden');
+                span.textContent = span.textContent.replace('Running...', 'Run ' + message.split(' ')[0]);
+            }).catch(() => {
+                showToast('Error starting ' + message.split(' ')[0].toLowerCase(), 'error');
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+                icon.classList.remove('hidden');
+                span.textContent = 'Run ' + message.split(' ')[0];
+            });
+        }
+    </script>
 
     <!-- Status -->
     <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
